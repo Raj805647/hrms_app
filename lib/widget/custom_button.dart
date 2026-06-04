@@ -1,88 +1,75 @@
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_theme.dart';
 import 'help_widget.dart';
+
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
 class AppButton extends StatelessWidget {
   final String title;
-  final VoidCallback? onPressed;
-  final bool isLoading;
   final IconData? icon;
-  final double height;
-  final double borderRadius;
-  final EdgeInsetsGeometry? margin;
+  final VoidCallback onPressed;
+  final bool isLoading;
+  final bool isOutlined;
 
   const AppButton({
     super.key,
     required this.title,
-    this.onPressed,
-    this.isLoading = false,
     this.icon,
-    this.height = 56,
-    this.borderRadius = 18,
-    this.margin,
+    required this.onPressed,
+    this.isLoading = false,
+    this.isOutlined = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final themeManager = Provider.of<ThemeManager>(context);
 
-    return Container(
-      height: height,
-      margin: margin,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        gradient: LinearGradient(
-          colors: [
-            colorScheme.primary,
-            colorScheme.secondary,
-          ],
+    return ElevatedButton(
+      onPressed: isLoading ? null : onPressed,
+      style: isOutlined
+          ? ElevatedButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        foregroundColor: themeManager.primary,
+        elevation: 0,
+        side: BorderSide(color: themeManager.primary),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withOpacity(.25),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+      )
+          : ElevatedButton.styleFrom(
+        backgroundColor: themeManager.primary,
+        foregroundColor: Colors.white,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(borderRadius),
-          onTap: isLoading ? null : onPressed,
-          child: Center(
-            child: isLoading
-                ? const SizedBox(
-              height: 22,
-              width: 22,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        child: isLoading
+            ? Center(
               child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Colors.white,
+                strokeWidth: 2,
+                color: isOutlined ? themeManager.primary : Colors.white,
               ),
             )
-                : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[
-                  Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  spaceWidth(8),
-                ],
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: .3,
-                  ),
-                ),
-              ],
+            : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+            if (icon != null) ...[
+              const SizedBox(width: 8),
+              Icon(icon, size: 18),
+            ],
+          ],
         ),
       ),
     );

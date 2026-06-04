@@ -1,31 +1,57 @@
 import 'package:flutter/material.dart';
 
+// lib/core/theme/app_colors.dart
+import 'package:flutter/material.dart';
+
 class AppColors {
-  // Brand
-  static const Color primary = Color(0xFF2563EB);
-  static const Color secondary = Color(0xFF4F46E5);
-
-  // Status
-  static const Color success = Color(0xFF22C55E);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color error = Color(0xFFEF4444);
-
-  // Light Theme
-  static const lightBackground = Color(0xFFF8F9FD);
-  static const lightCard = Colors.white;
+  // Light Mode Colors
+  static const Color lightPrimary = Color(0xFF2563EB);
+  static const Color lightSecondary = Color(0xFF3B82F6);
+  static const Color lightTertiary = Color(0xFF60A5FA);
+  static const Color lightBackground = Color(0xFFF3F4F6);
   static const Color lightSurface = Colors.white;
+  static const Color lightText = Color(0xFF1F2937);
+  static const Color lightTextSecondary = Color(0xFF6B7280);
 
-  static const Color lightTextPrimary = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF64748B);
+  // Dark Mode Colors
+  static const Color darkPrimary = Color(0xFF3B82F6);
+  static const Color darkSecondary = Color(0xFF60A5FA);
+  static const Color darkTertiary = Color(0xFF93C5FD);
+  static const Color darkBackground = Color(0xFF111827);
+  static const Color darkSurface = Color(0xFF1F2937);
+  static const Color darkText = Color(0xFFF9FAFB);
+  static const Color darkTextSecondary = Color(0xFF9CA3AF);
 
-  // Dark Theme
-  static const Color darkBackground = Color(0xFF0F172A);
-  static const Color darkSurface = Color(0xFF1E293B);
+  // Splash Screen Gradients
+  static const List<Color> lightSplashGradient = [
+    Color(0xFF2563EB),
+    Color(0xFF3B82F6),
+    Color(0xFF60A5FA),
+  ];
 
-  static const Color darkTextPrimary = Color(0xFFF8FAFC);
-  static const Color darkTextSecondary = Color(0xFFCBD5E1);
+  static const List<Color> darkSplashGradient = [
+    Color(0xFF1F2937),
+    Color(0xFF111827),
+    Color(0xFF000000),
+  ];
+
+  static get primary => null;
+
+  static get secondary => null;
+
+  // Circle Colors for Splash Screen
+  static Color getCircle1Color(bool isDarkMode) {
+    return isDarkMode ? Colors.blue[800]! : Colors.white;
+  }
+
+  static Color getCircle2Color(bool isDarkMode) {
+    return isDarkMode ? Colors.cyan[800]! : AppColors.lightSecondary;
+  }
+
+  static Color getCircle3Color(bool isDarkMode) {
+    return isDarkMode ? Colors.purple[800]! : AppColors.lightTertiary;
+  }
 }
-
 extension AppThemeExtension on BuildContext {
   bool get isDark =>
       Theme.of(this).brightness ==

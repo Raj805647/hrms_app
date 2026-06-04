@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../widget/custom_button.dart';
 import '../../../widget/custom_textfield.dart';
-import '../../../widget/help_widget.dart';
+
 import 'forgot_password_provider.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -10,155 +11,247 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final themeManager = Provider.of<ThemeManager>(context);
 
     return Consumer<ForgotPasswordProvider>(
-      builder: (_, provider, __) {
+      builder: (context, provider, _) {
         return Scaffold(
           body: SizedBox(
             height: double.infinity,
             child: Stack(
               children: [
-
-                /// Background
+                // Background gradient
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          colorScheme.primary.withOpacity(.08),
-                          colorScheme.secondary.withOpacity(.05),
-                          colorScheme.surface,
+                        colors: themeManager.isDarkMode
+                            ? [
+                          Colors.grey[900]!.withOpacity(0.5),
+                          Colors.grey[850]!.withOpacity(0.3),
+                          Colors.black,
+                        ]
+                            : [
+                          themeManager.primary.withOpacity(0.05),
+                          themeManager.secondary.withOpacity(0.03),
+                          Colors.white,
                         ],
                       ),
                     ),
                   ),
                 ),
 
-                /// Top Blob
+                // Top decorative circle
                 Positioned(
                   top: -120,
                   right: -80,
-                  child: Container(
-                    height: 280,
-                    width: 280,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color:
-                      colorScheme.primary.withOpacity(.08),
-                    ),
+                  child: TweenAnimationBuilder(
+                    tween: Tween(begin: 0.8, end: 1.0),
+                    duration: const Duration(seconds: 2),
+                    curve: Curves.easeInOut,
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: Container(
+                          height: 280,
+                          width: 280,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: themeManager.primary.withOpacity(0.08),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
 
-                /// Bottom Blob
-                SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24,vertical:150),
-                  child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.center,
-                    children: [
-                      spaceHeight(20),
-
-                      Center(
+                // Bottom decorative circle
+                Positioned(
+                  bottom: -150,
+                  left: -100,
+                  child: TweenAnimationBuilder(
+                    tween: Tween(begin: 0.8, end: 1.0),
+                    duration: const Duration(seconds: 2, milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
                         child: Container(
-                          height: 120,
-                          width: 120,
+                          height: 320,
+                          width: 320,
                           decoration: BoxDecoration(
-                            borderRadius:
-                            BorderRadius.circular(30),
-                            gradient: LinearGradient(
-                              colors: [
-                                colorScheme.primary,
-                                colorScheme.secondary,
-                              ],
-                            ),
+                            shape: BoxShape.circle,
+                            color: themeManager.secondary.withOpacity(0.08),
                           ),
-                          child: const Icon(
-                            Icons.lock_reset_rounded,
-                            color: Colors.white,
-                            size: 60,
-                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                // Main content
+                SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 100),
+
+                      // Animated Icon
+                      Center(
+                        child: TweenAnimationBuilder(
+                          tween: Tween(begin: 0.5, end: 1.0),
+                          duration: const Duration(milliseconds: 800),
+                          curve: Curves.elasticOut,
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: value,
+                              child: Container(
+                                height: 120,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      themeManager.primary,
+                                      themeManager.secondary,
+                                    ],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: themeManager.primary.withOpacity(0.3),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.lock_reset_rounded,
+                                  color: Colors.white,
+                                  size: 60,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
 
-                      spaceHeight(40),
+                      const SizedBox(height: 40),
 
+                      // Title
                       Text(
                         "Forgot Password?",
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                          fontWeight:
-                          FontWeight.w800,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: themeManager.text,
                         ),
                       ),
 
-                      spaceHeight(10),
+                      const SizedBox(height: 12),
 
+                      // Description
                       Text(
-                        "Enter your registered email address and we'll send you a verification code.",
+                        "Enter your registered email address and we'll send you a verification code to reset your password.",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: colorScheme.onSurface
-                              .withOpacity(.65),
+                          color: themeManager.textSecondary,
                           height: 1.6,
+                          fontSize: 15,
                         ),
                       ),
 
-                      spaceHeight(40),
+                      const SizedBox(height: 40),
 
-                      AppTextField(
-                        controller:
-                        provider.emailController,
-                        hintText:
-                        "Email Address",
-                        prefixIcon:
-                        Icons.email_outlined,
-                        keyboardType:
-                        TextInputType.emailAddress,
+                      // Email Field with validation
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppTextField(
+                            controller: provider.emailController,
+                            hintText: "Email Address",
+                            prefixIcon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          if (provider.emailError != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8, left: 12),
+                              child: Text(
+                                provider.emailError!,
+                                style: TextStyle(
+                                  color: Colors.red[400],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
 
-                      spaceHeight(30),
+                      const SizedBox(height: 30),
 
+                      // Send OTP Button
                       AppButton(
                         title: "Send OTP",
-                        icon:
-                        Icons.arrow_forward_rounded,
-                        isLoading:
-                        provider.isLoaded,
-                        onPressed: ()=>
-                        provider.sendOtp(context),
+                        icon: Icons.arrow_forward_rounded,
+                        isLoading: provider.isLoaded,
+                        onPressed: () => provider.sendOtp(context),
                       ),
 
-                      spaceHeight(20),
+                      const SizedBox(height: 20),
 
+                      // Back to Sign In
                       Center(
                         child: TextButton(
                           onPressed: () {
                             Navigator.pop(context);
                           },
+                          style: TextButton.styleFrom(
+                            foregroundColor: themeManager.primary,
+                          ),
                           child: const Text(
-                            "Back to Sign In",
+                            "← Back to Sign In",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
 
-                Positioned(
-                  bottom: -150,
-                  left: -100,
-                  child: Container(
-                    height: 320,
-                    width: 320,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.secondary
-                          .withOpacity(.08),
-                    ),
+                      const SizedBox(height: 40),
+
+                      // Info text
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: themeManager.isDarkMode
+                              ? Colors.white.withOpacity(0.05)
+                              : themeManager.primary.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 20,
+                              color: themeManager.primary,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                "We'll send a 6-digit verification code to your email",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: themeManager.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+                    ],
                   ),
                 ),
               ],

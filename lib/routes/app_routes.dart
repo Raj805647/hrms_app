@@ -6,10 +6,15 @@ import '../features/auth/forgot_password/forgot_password_screen.dart';
 import '../features/auth/onboarding/onboarding_screen.dart';
 import '../features/auth/sign_in/sign_in_screen.dart';
 import '../features/auth/splash/splash_screen.dart';
+import '../features/screens/app_setting/app_setting_screen.dart';
 import '../features/screens/attendance/attendance_screen.dart';
 import '../features/screens/bottom_nav_bar/bottom_nav_bar_screen.dart';
 import '../features/screens/dashboard/dashboard_screen.dart';
+import '../features/screens/meeting_room/meeting_room_screen.dart';
+import '../features/screens/meeting_schedule/meeting_schedule_screen.dart';
+import '../features/screens/metting/meeting_screen.dart';
 import '../features/screens/notification/notification_screen.dart';
+import '../features/screens/profile/profile_edit_screen.dart';
 import '../features/screens/profile/profile_screen.dart';
 import 'route_names.dart';
 
@@ -26,7 +31,7 @@ class AppRoutes {
       ),
       GoRoute(
         path: RouteNames.onBoardingScreen,
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) => OnboardingScreen(),
       ),
       GoRoute(
         path: RouteNames.signInScreen,
@@ -51,6 +56,10 @@ class AppRoutes {
         builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
+        path: RouteNames.profileEditScreen,
+        builder: (context, state) => const ProfileEditScreen(),
+      ),
+      GoRoute(
         path: RouteNames.attendanceScreen,
         builder: (context, state) => const AttendanceScreen(),
       ),
@@ -61,13 +70,30 @@ class AppRoutes {
       GoRoute(
         path: RouteNames.chatScreen,
         builder: (context, state) => const ChatScreen(),
-      ), GoRoute(
+      ),
+      GoRoute(
         path: RouteNames.chatDetailsScreen,
         builder: (context, state) => const ChatDetailScreen(),
       ),
       GoRoute(
         path: RouteNames.notificationScreen,
         builder: (context, state) => const NotificationScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.meetingScreen,
+        builder: (context, state) => const MeetingScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.meetingRoomScreen,
+        builder: (context, state) => const MeetingRoomScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.meetingScheduleScreen,
+        builder: (context, state) => const ScheduleMeetingScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.appSettingScreen,
+        builder: (context, state) => const AppSettingScreen(),
       ),
     ],
   );

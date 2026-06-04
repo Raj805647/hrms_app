@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 import '../../../core/utils.dart';
 import '../../../routes/route_names.dart';
 
+import 'package:flutter/material.dart';
+
 class OnboardingProvider extends BaseProvider {
   final PageController pageController = PageController();
-
   int currentIndex = 0;
 
   void onPageChanged(int index) {
@@ -17,19 +18,21 @@ class OnboardingProvider extends BaseProvider {
   }
 
   Future<void> nextPage(BuildContext context) async {
-    if (currentIndex < 4) {
+    // Fix: Check if currentIndex is the last page (index 3 for 4 items)
+    if (currentIndex < onboardingItems.length - 1) {
       await pageController.nextPage(
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     } else {
-      /// Navigate Login
+      // Navigate to Login/SignIn screen
       navigateTo(context, RouteNames.signInScreen);
     }
   }
 
-  Future<void> skip() async {
-    /// Navigate Login
+  Future<void> skip(BuildContext context) async {
+    // Navigate directly to Login/SignIn screen
+    navigateTo(context, RouteNames.signInScreen);
   }
 
   @override
