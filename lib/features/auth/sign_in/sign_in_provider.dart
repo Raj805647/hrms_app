@@ -22,17 +22,18 @@ class SignInProvider extends BaseProvider {
     setLoading(true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-
       // TODO: Implement actual login API call
-      // Example:
-      // final response = await apiService.login(
-      //   emailController.text.trim(),
-      //   passwordController.text,
-      // );
-
-      // if (response.success) {
+      final Map<String,dynamic> body = {
+        "username": emailController.text,
+        "password": passwordController.text,
+        "fcm_token": "test_fcm_token",
+        "device_type": "android"
+      };
+    final response = await authRepository.signIn(body);
+    if(response.isSuccess){
+      showSnackBar(context, 'Login Successfully');
       navigateTo(context, RouteNames.bottomNavigationScreen);
+    }
       // } else {
       //   showError(response.message);
       // }
