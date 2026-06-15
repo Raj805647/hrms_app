@@ -5,8 +5,10 @@ import 'package:hrms_app/routes/app_routes.dart';
 import 'config/provider_config.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
+import 'features/screens/app_setting/app_setting_provider.dart';
 
 class HrmsApp extends StatelessWidget {
   const HrmsApp({super.key});
@@ -23,6 +25,23 @@ class HrmsApp extends StatelessWidget {
             routerConfig: AppRoutes.router,
 
             themeMode: themeManager.themeMode,
+
+            // Language
+            locale: Locale(
+              context.watch<AppSettingsProvider>().language,
+            ),
+
+            supportedLocales: const [
+              Locale('en'),
+              Locale('hi'),
+              Locale('gu'),
+            ],
+
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
 
             // Smooth transition
             themeAnimationDuration: const Duration(milliseconds: 800),

@@ -1,3 +1,6 @@
+import 'package:base_module/core/app_dialog.dart';
+import 'package:base_module/core/storage/storage_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/routes/route_names.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DashboardProvider>().init();
-    });
+ context.read<DashboardProvider>().init(context);
   }
 
   @override
@@ -30,15 +31,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, provider, _) {
         return Scaffold(
           backgroundColor: themeManager.background,
-          drawer: _buildDrawer(context, themeManager),
+          drawer: _buildDrawer(context, themeManager, provider),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  _buildDashboardHeader(context, themeManager),
+                  _buildDashboardHeader(context, themeManager, provider),
                   const SizedBox(height: 20),
-                  _buildEmployeeCard(themeManager),
+                  _buildEmployeeCard(themeManager,provider),
                   const SizedBox(height: 20),
                   _buildStatisticsRow(provider, themeManager),
                   const SizedBox(height: 25),
@@ -65,6 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildDashboardHeader(
     BuildContext context,
     ThemeManager themeManager,
+    DashboardProvider provider,
   ) {
     final hour = DateTime.now().hour;
     String greeting = "Good Morning";
@@ -99,7 +101,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               Text(
-                "John Doe",
+                provider.employeeDashboardData.user?.name ?? 'User',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
@@ -112,14 +114,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
         CircleAvatar(
           radius: 24,
           backgroundColor: themeManager.primary,
-          child: const Text("JD", style: TextStyle(color: Colors.white)),
+          child: ClipOval(
+            child: Image.network(
+              provider.employeeDashboardData.user?.avatar ?? '',
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+              loadingBuilder: (
+                  context,
+                  child,
+                  loadingProgress,
+                  ) {
+                if (loadingProgress == null) {
+                  return child;
+                }
+
+                return const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Center(
+                  child: Text(
+                    provider.employeeDashboardData.user?.name
+                        ?.substring(0, 1)
+                        .toUpperCase() ??
+                        "U",
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ],
     );
   }
 
   // Employee Card
-  Widget _buildEmployeeCard(ThemeManager themeManager) {
+  Widget _buildEmployeeCard(ThemeManager themeManager, DashboardProvider provider) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -134,8 +175,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           const Text("Employee ID", style: TextStyle(color: Colors.white70)),
           const SizedBox(height: 8),
-          const Text(
-            "EMP-1025",
+           Text(
+            "EMP-${provider.employeeDashboardData.user?.id ?? 'User'}",
             style: TextStyle(
               color: Colors.white,
               fontSize: 26,
@@ -151,8 +192,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 size: 16,
               ),
               const SizedBox(width: 4),
-              const Text(
-                "Senior Developer",
+               Text(
+                 provider.employeeDashboardData.user?.department ?? 'Department',
                 style: TextStyle(color: Colors.white70),
               ),
               const Spacer(),
@@ -179,6 +220,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     DashboardProvider provider,
     ThemeManager themeManager,
   ) {
+    final totalAttendance = (provider.employeeDashboardData.overview?.presentDays ?? 0) * 100 / 30;
+    final totalLeaves = provider.employeeDashboardData.overview?.totalHolidays ?? 0;
+    final leavesTaken = provider.employeeDashboardData.overview?.totalLeaveTaken ?? 0;
     return Column(
       children: [
         Row(
@@ -186,7 +230,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: _buildStatCard(
                 "Attendance",
-                "${provider.attendancePercentage.toStringAsFixed(1)}%",
+                "${totalAttendance.toStringAsFixed(2)} %",
                 Icons.fingerprint,
                 Colors.blue,
                 themeManager,
@@ -196,7 +240,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: _buildStatCard(
                 "Leaves Left",
-                "${provider.totalLeaves - provider.leavesTaken}",
+                "${totalLeaves - leavesTaken}",
                 Icons.event_busy,
                 Colors.orange,
                 themeManager,
@@ -210,7 +254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: _buildStatCard(
                 "Tasks Done",
-                "${provider.completedTasks}/${provider.totalTasks}",
+                "${provider.employeeDashboardData.overview?.totalPendingTasks}/${provider.employeeDashboardData.overview?.totalAssignedProjects}",
                 Icons.task_alt,
                 Colors.green,
                 themeManager,
@@ -220,7 +264,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: _buildStatCard(
                 "Pending Leaves",
-                "${provider.pendingLeavesCount}",
+                "${provider.employeeDashboardData.overview?.totalPendingLeaves}",
                 Icons.pending_actions,
                 Colors.red,
                 themeManager,
@@ -678,7 +722,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Dashboard Drawer
-  Widget _buildDrawer(BuildContext context, ThemeManager themeManager) {
+  Widget _buildDrawer(BuildContext context, ThemeManager themeManager, DashboardProvider provider) {
     final provider = context.read<DashboardProvider>();
     return Drawer(
       child: Column(
@@ -689,11 +733,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 colors: [themeManager.primary, themeManager.secondary],
               ),
             ),
-            accountName: const Text("John Doe"),
-            accountEmail: const Text("john.doe@company.com"),
-            currentAccountPicture: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Text("JD", style: TextStyle(fontWeight: FontWeight.bold)),
+            accountName:  Text(provider.employeeDashboardData.user?.name ?? 'User'),
+            accountEmail: Text(provider.employeeDashboardData.user?.email ?? 'User'),
+            currentAccountPicture:         CircleAvatar(
+              radius: 24,
+              backgroundColor: themeManager.primary,
+              child: ClipOval(
+                child: Image.network(
+                  provider.employeeDashboardData.user?.avatar ?? '',
+                  width: 55,
+                  height: 55,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (
+                      context,
+                      child,
+                      loadingProgress,
+                      ) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+
+                    return const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        provider.employeeDashboardData.user?.name
+                            ?.substring(0, 1)
+                            .toUpperCase() ??
+                            "U",
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
           _buildDrawerItem(Icons.person, "Profile", themeManager, () {}),
@@ -733,7 +817,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Icons.logout,
             "Logout",
             themeManager,
-            () {},
+            () => AppDialogs.showLogoutDialog(context, () {
+              Navigator.of(context).pop(); // Close dialog
+              provider.logOut(context);
+            }),
             isLogout: true,
           ),
           const SizedBox(height: 20),

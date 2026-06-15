@@ -301,7 +301,7 @@ class AppDialogs {
   }
   static Future<Object> showLogoutDialog(
       BuildContext context,
-      String routesName,
+VoidCallback onTap,
       ) async {
     final result = await showGeneralDialog(
       context: context,
@@ -485,22 +485,7 @@ class AppDialogs {
 
                           Expanded(
                             child: GestureDetector(
-                              onTap: () async {
-                                await StorageService
-                                    .clearAllData();
-
-                                Navigator.pop(
-                                  context,
-                                  true,
-                                );
-
-                                Navigator
-                                    .pushNamedAndRemoveUntil(
-                                  context,
-                                  routesName,
-                                      (route) => false,
-                                );
-                              },
+                              onTap: onTap,
 
                               child: Container(
                                 height: 56,

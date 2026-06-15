@@ -12,7 +12,6 @@ class AuthRepository extends BaseRepository {
 
   Future<Result<dynamic>> signIn(Map<String, dynamic> body) {
     return safeApiCall(() async {
-      debugPrint("SIGN IN REQUEST: $body");
 
       final response = await apiClient.postDio(
         AppConfig.actionSignIn,
@@ -20,8 +19,22 @@ class AuthRepository extends BaseRepository {
         body: body,
       );
 
-      debugPrint("SIGN IN RESPONSE: ${response.data}");
+      return response.data;
+    });
+  }
 
+  Future<Result<dynamic>> signOut(String userToken) {
+    return safeApiCall(() async {
+      final response = await apiClient.getDio(AppConfig.actionSignOut);
+      debugPrint("SIGN IN RESPONSE: ${response.data}");
+      return response.data;
+    });
+  }
+
+  Future<Result<dynamic>> employeeDashboard() {
+    return safeApiCall(() async {
+      final response = await apiClient.getDio(AppConfig.actionEmployeeDashboard);
+      debugPrint("SIGN IN RESPONSE: ${response.data}");
       return response.data;
     });
   }

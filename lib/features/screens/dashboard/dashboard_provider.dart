@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:base_module/base_module.dart';
+import 'package:base_module/core/models/employee_dashboard_response.dart';
 import 'package:flutter/material.dart';
+import 'package:hrms_app/routes/route_names.dart';
 import 'package:intl/intl.dart';
 
 class DashboardProvider extends BaseProvider {
+  bool isLoad = false;
+  EmployeeDashboardData employeeDashboardData = EmployeeDashboardData();
   DateTime currentTime = DateTime.now();
   Timer? timer;
 
@@ -17,9 +22,17 @@ class DashboardProvider extends BaseProvider {
   // Today's Tasks
   List<Map<String, dynamic>> todayTasks = [
     {"title": "Complete HR report", "isCompleted": false, "priority": "high"},
-    {"title": "Review leave requests", "isCompleted": false, "priority": "medium"},
+    {
+      "title": "Review leave requests",
+      "isCompleted": false,
+      "priority": "medium",
+    },
     {"title": "Team meeting", "isCompleted": true, "priority": "low"},
-    {"title": "Update employee records", "isCompleted": false, "priority": "high"},
+    {
+      "title": "Update employee records",
+      "isCompleted": false,
+      "priority": "high",
+    },
   ];
 
   // Upcoming Holidays
@@ -32,26 +45,75 @@ class DashboardProvider extends BaseProvider {
 
   // Notices/Announcements
   List<Map<String, dynamic>> announcements = [
-    {"title": "Annual Performance Review", "date": "Dec 15, 2024", "priority": "high", "description": "Submit your self-assessment by Dec 20"},
-    {"title": "Office Holiday Schedule", "date": "Dec 10, 2024", "priority": "medium", "description": "Office will remain closed from Dec 25 to Jan 1"},
-    {"title": "New HR Policy Update", "date": "Dec 5, 2024", "priority": "low", "description": "Updated work from home policy effective Jan 2025"},
+    {
+      "title": "Annual Performance Review",
+      "date": "Dec 15, 2024",
+      "priority": "high",
+      "description": "Submit your self-assessment by Dec 20",
+    },
+    {
+      "title": "Office Holiday Schedule",
+      "date": "Dec 10, 2024",
+      "priority": "medium",
+      "description": "Office will remain closed from Dec 25 to Jan 1",
+    },
+    {
+      "title": "New HR Policy Update",
+      "date": "Dec 5, 2024",
+      "priority": "low",
+      "description": "Updated work from home policy effective Jan 2025",
+    },
   ];
 
   // Pending Leave Requests
   List<Map<String, dynamic>> pendingLeaveRequests = [
-    {"employee": "Sarah Johnson", "type": "Sick Leave", "days": 2, "status": "pending", "date": "Dec 20-21"},
-    {"employee": "Michael Chen", "type": "Casual Leave", "days": 1, "status": "pending", "date": "Dec 23"},
-    {"employee": "Priya Sharma", "type": "Annual Leave", "days": 5, "status": "approved", "date": "Dec 27-31"},
+    {
+      "employee": "Sarah Johnson",
+      "type": "Sick Leave",
+      "days": 2,
+      "status": "pending",
+      "date": "Dec 20-21",
+    },
+    {
+      "employee": "Michael Chen",
+      "type": "Casual Leave",
+      "days": 1,
+      "status": "pending",
+      "date": "Dec 23",
+    },
+    {
+      "employee": "Priya Sharma",
+      "type": "Annual Leave",
+      "days": 5,
+      "status": "approved",
+      "date": "Dec 27-31",
+    },
   ];
 
   // Quick Actions
   final List<Map<String, dynamic>> quickActions = [
-    {"title": "Attendance", "icon": Icons.fingerprint_rounded, "route": "attendance"},
-    {"title": "Apply Leave", "icon": Icons.event_available_rounded, "route": "leave"},
+    {
+      "title": "Attendance",
+      "icon": Icons.fingerprint_rounded,
+      "route": "attendance",
+    },
+    {
+      "title": "Apply Leave",
+      "icon": Icons.event_available_rounded,
+      "route": "leave",
+    },
     {"title": "My Tasks", "icon": Icons.task_alt_rounded, "route": "tasks"},
     {"title": "Team Chat", "icon": Icons.chat_rounded, "route": "chat"},
-    {"title": "Join Meeting", "icon": Icons.video_call_rounded, "route": "meeting"},
-    {"title": "Notice Board", "icon": Icons.campaign_rounded, "route": "notices"},
+    {
+      "title": "Join Meeting",
+      "icon": Icons.video_call_rounded,
+      "route": "meeting",
+    },
+    {
+      "title": "Notice Board",
+      "icon": Icons.campaign_rounded,
+      "route": "notices",
+    },
   ];
 
   // Statistics
@@ -61,11 +123,48 @@ class DashboardProvider extends BaseProvider {
   int completedTasks = 12;
   int totalTasks = 18;
 
-  void init() {
-    timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      currentTime = DateTime.now();
+  void init(BuildContext context) {
+      fetchEmployeeDashboard(context);
+  }
+
+  Future<void> fetchEmployeeDashboard(BuildContext context) async{
+    try{
+      isLoad = true;
       notifyListeners();
-    });
+
+      final response = await authRepository.employeeDashboard();
+      print('adnfsadf=> ${response.data}');
+      print('adnfsadf=> ${response.error}');
+
+      if(response.isSuccess){
+        final rowData = response.data['data'];
+        employeeDashboardData = EmployeeDashboardData.fromJson(rowData);
+        notifyListeners();
+      }
+
+    }catch(error) {
+      showSnackBar(context, 'Logout API Error: $error');
+    }finally{
+      isLoad = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> logOut(BuildContext context) async {
+
+    try {
+      final token = await StorageService.getUserToken() ?? '';
+
+      await authRepository.signOut(token);
+    } catch (e) {
+      debugPrint('Logout API Error: $e');
+    } finally {
+      await StorageService.clearAllData();
+
+      if (context.mounted) {
+        navigateAndClearStack(context, RouteNames.signInScreen);
+      }
+    }
   }
 
   void toggleTaskCompletion(int index) {
@@ -74,7 +173,9 @@ class DashboardProvider extends BaseProvider {
   }
 
   int get pendingLeavesCount {
-    return pendingLeaveRequests.where((leave) => leave['status'] == 'pending').length;
+    return pendingLeaveRequests
+        .where((leave) => leave['status'] == 'pending')
+        .length;
   }
 
   int get upcomingHolidaysCount {

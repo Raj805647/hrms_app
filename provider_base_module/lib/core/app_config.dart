@@ -1,5 +1,5 @@
 class AppConfig {
-  static const String apiTestUrl = "http://192.168.1.16:8000/api";
+  static const String apiTestUrl = "http://192.168.1.3:8000/api";
   static const String apiProdUrl = "https://hrm.teknowxa.com/api";
   static const String imageUrl = "http://192.168.1.12:8000";
   static const String apiTestKey = "";
@@ -14,6 +14,8 @@ class AppConfig {
 
   //auth api call
   static const String actionSignIn = '/login';
+  static const String actionSignOut = '/logout';
+  static const String actionEmployeeDashboard = '/dashboard';
   static const String actionSignUp = '/register';
   static const String actionProfile = '/profile';
   static const String actionServiceCategory = '/categories';

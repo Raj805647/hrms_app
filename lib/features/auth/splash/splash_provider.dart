@@ -41,7 +41,15 @@ class SplashProvider extends BaseProvider {
   void init(BuildContext context, TickerProvider vsync) {
     _vsync = vsync;
     _initializeAnimations();
-    Future.delayed(Duration(seconds: 3),()=> navigateAndClearStack(context, RouteNames.onBoardingScreen) );
+    Future.delayed(Duration(seconds: 3),() async{
+      final userToken = await StorageService.getUserToken() ?? '';
+      print('user token = $userToken');
+      if(userToken.isEmpty) {
+        navigateAndClearStack(context, RouteNames.onBoardingScreen);
+      } else {
+        navigateAndClearStack(context, RouteNames.bottomNavigationScreen);
+      }
+    });
   }
 
   void _initializeAnimations() {
